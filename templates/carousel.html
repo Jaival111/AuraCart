@@ -1,0 +1,56 @@
+{% macro carousel(product_, category) %}
+<div id="carousel{{category}}" class="carousel carousel-dark slide m-5 mt-2" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        {% for product_list in product_ %}
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{loop.index0}}" class="active" aria-current="true" aria-label="Slide {{loop.index}}"></button>
+        {% endfor %}
+    </div>
+    <div class="carousel-inner">
+        {% for product_list in product_ %}
+        {% if loop.index == 1 %}
+        <div class="carousel-item active">
+            <div class="card-wrapper">
+                {% for product in product_list %}
+                <div class="card" style="width: 18rem; max-height: 500px;">
+                    <img src="{{product.img_link}}" class="card-img-top" alt="{{product.product_name}}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{product.product_name[:50]}}...</h5>
+                        <p class="card-text" style="color: red;"><strong>-{{product.discount_percentage}} <span class="card-text" style="color: black;">{{product.discounted_price}}</span>
+                        <span class="card-text" style="text-decoration: line-through; color: grey;">{{product.actual_price}}</span></strong></p>
+                        <p class="card-text">{{product.about_product[:100]}}...</p>
+                        <a href="/product-{{product.product_id}}" class="btn btn-dark">Buy now</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="carousel-item">
+            <div class="card-wrapper">
+                {% for product in product_list %}
+                <div class="card" style="width: 18rem; max-height: 500px;">
+                    <img src="{{product.img_link}}" class="card-img-top" alt="{{product.product_name}}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{product.product_name[:50]}}...</h5>
+                        <p class="card-text" style="color: red;"><strong>-{{product.discount_percentage}} <span class="card-text" style="color: black;">{{product.discounted_price}}</span>
+                        <span class="card-text" style="text-decoration: line-through; color: grey;">{{product.actual_price}}</span></strong></p>
+                        <p class="card-text">{{product.about_product[:100]}}...</p>
+                        <a href="/" class="btn btn-dark">Buy now</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{category}}" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carousel{{category}}" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+{% endmacro %}
