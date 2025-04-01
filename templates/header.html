@@ -1,24 +1,66 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">AuraCart</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand fw-light" href="/" style="letter-spacing: 2px; color: #F8F4E3; font-family: 'Playfair Display', serif; font-size: 1.8rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">AURACART</a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
             data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
             aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/">Home</a>
+                    <a class="nav-link active fw-light" aria-current="page" href="/" style="color: #F8F4E3; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/login">Login</a>
+                    <a class="nav-link fw-light" href="/login" style="color: #F8F4E3; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">Login</a>
                 </li>
             </ul>
-            <form class="d-flex" role="search" method="post">
-                <input class="form-control me-2 rounded-start-pill rounded-2" type="search" name="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-dark rounded-end-pill d-flex justify-content-center align-items-center" type="submit"><img src="{{ url_for('static', path='search.png') }}" alt="search" style="width: 20px; height: 20px;"></button>
+            <form class="d-flex align-items-center" role="search" method="post">
+                <input class="form-control me-2 border-0 search-bar" type="search" name="search" placeholder="Search products..." aria-label="Search">
+                <button class="btn border-0 d-flex justify-content-center align-items-center me-3" type="submit" style="background-color: #F8F4E3; border: 2px solid #F8F4E3;">
+                    <img src="{{ url_for('static', path='search.png') }}" alt="search" style="width: 16px; height: 16px; filter: invert(0); opacity: 0.8;">
+                </button>
+                <div class="cart-wrapper position-relative" style="margin-right: 1rem;">
+                    <a href="/cart" class="cart-icon d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(248, 244, 227, 0.2); border-radius: 50%; text-decoration: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#F8F4E3" class="bi bi-cart" viewBox="0 0 16 16">
+                            <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                        </svg>
+                        <span class="cart-count position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                    </a>
+                </div>
             </form>
         </div>
     </div>
 </nav>
+
+<style>
+.cart-icon {
+    transition: transform 0.3s ease;
+}
+
+.cart-icon:hover {
+    transform: scale(1.1);
+}
+
+.cart-count {
+    transform: translate(-50%, -50%);
+    font-size: 0.7rem;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-bar {
+    background: rgba(248, 244, 227, 0.4);
+    border: 1px solid rgba(248, 244, 227, 0.3);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    width: 300px;
+    color: #1a0533;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+</style>
