@@ -10,16 +10,25 @@
 
 <body>
     <div class="container-fluid vh-100 d-flex justify-content-center align-items-center">
-        <form method="post" action="/">
+        <form method="post" action="/token" enctype="application/x-www-form-urlencoded">
             <h1 class="text-center m-3">Login</h1>
+            {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+            {% endif %}
+            {% if message %}
+            <div class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+            {% endif %}
             <div class="mb-3">
-                <label for="email" class="form-label">Email address</label>
-                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp">
-                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password">
+                <input type="password" class="form-control" id="password" name="password" required>
             </div>
             <p>Don't have an account? <a href="/signup" style="text-decoration: none;">Signup</a> here!</p>
             <p>Go to <a href="/" style="text-decoration: none;">home</a> page.</p>
