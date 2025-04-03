@@ -41,11 +41,11 @@ async def search(request: Request, search: str = Form(...)):
     search_query = search.strip().lower()
     
     if not search_query:
-        return templates.TemplateResponse("search.html", {"request": request, "search_results": [], "message": "Please enter a search query."})
+        return templates.TemplateResponse("search.html", {"request": request, "search_results": [], "message": "Please enter a search query.", "search_query": ""})
 
     search_results = df[df["product_name"].str.contains(search_query, case=False, na=False)].to_dict(orient="records")
 
-    return templates.TemplateResponse("search.html", {"request": request, "search_results": search_results, "message": "No results found." if not search_results else ""})
+    return templates.TemplateResponse("search.html", {"request": request, "search_results": search_results, "message": "No results found." if not search_results else "", "search_query": search})
 
 @app.get('/product-{product_id}', response_class=HTMLResponse)
 async def product(product_id: str, request: Request):

@@ -4,28 +4,719 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <title>AuraCart | Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Login | AuraCart</title>
+    <style>
+        :root {
+            --primary-color: #34154D;
+            --secondary-color: #9D4EDD;
+            --accent-color: #E76F51;
+            --background-color: #F5F7FA;
+            --dark-bg: #22112E;
+            --light-text: #FFFFFF;
+            --dark-text: #2D2D2D;
+            --subtle-text: #4A5568;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --gradient-primary: linear-gradient(135deg, #9D4EDD 0%, #34154D 100%);
+            --gradient-accent: linear-gradient(135deg, #E76F51 0%, #F4A261 100%);
+            --violet-gradient: linear-gradient(135deg, #34154D 0%, #9D4EDD 100%);
+            --font-primary: 'Inter', sans-serif;
+            --font-heading: 'Montserrat', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(135deg, rgba(245, 247, 250, 1), rgba(250, 248, 252, 1));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(52,21,77,0.05)" stroke-width="2"/></svg>') repeat;
+            opacity: 0.5;
+            animation: rotate 30s linear infinite;
+            z-index: 0;
+        }
+
+        .login-container {
+            background: linear-gradient(145deg, #ffffff, #f8f7fa);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            transform: translateY(0);
+            transition: var(--transition);
+            z-index: 1;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(52, 21, 77, 0.15);
+        }
+
+        .login-header {
+            background: var(--violet-gradient);
+            padding: 2.5rem;
+            text-align: center;
+            color: var(--light-text);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/></svg>') repeat;
+            opacity: 0.1;
+            animation: rotate 20s linear infinite;
+        }
+
+        .login-header h1 {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-form {
+            padding: 2.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            border: 2px solid rgba(52, 21, 77, 0.1);
+            border-radius: var(--border-radius);
+            padding: 0.8rem 1rem;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(157, 78, 221, 0.1);
+            background: #ffffff;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group .form-control {
+            padding-right: 3rem;
+        }
+
+        .input-group-text {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--subtle-text);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .input-group-text:hover {
+            color: var(--secondary-color);
+        }
+
+        .btn-login {
+            background: var(--violet-gradient);
+            color: var(--light-text);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 1rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(157, 78, 221, 0.3);
+        }
+
+        .btn-login:hover::before {
+            left: 100%;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 2rem 0;
+            color: var(--subtle-text);
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(52, 21, 77, 0.1);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+            font-size: 0.9rem;
+        }
+
+        .social-login {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--light-text);
+            font-size: 1.2rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .social-btn:hover::before {
+            left: 100%;
+        }
+
+        .social-btn.google {
+            background: #DB4437;
+        }
+
+        .social-btn.facebook {
+            background: #4267B2;
+        }
+
+        .social-btn.twitter {
+            background: #1DA1F2;
+        }
+
+        .login-footer {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(52, 21, 77, 0.02);
+        }
+
+        .login-footer a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .login-footer a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary-color);
+            transition: var(--transition);
+        }
+
+        .login-footer a:hover {
+            color: var(--primary-color);
+        }
+
+        .login-footer a:hover::after {
+            width: 100%;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .form-check-label {
+            color: var(--subtle-text);
+            font-size: 0.9rem;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 576px) {
+            .login-container {
+                margin: 1rem;
+            }
+
+            .login-header {
+                padding: 1.5rem;
+            }
+
+            .login-header h1 {
+                font-size: 2rem;
+            }
+
+            .login-form {
+                padding: 1.5rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container-fluid vh-100 d-flex justify-content-center align-items-center">
-        <form method="post" action="/">
-            <h1 class="text-center m-3">Login</h1>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email address</label>
-                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp">
-                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>Welcome Back</h1>
+            <p>Sign in to continue your shopping journey</p>
+        </div>
+        <form class="login-form">
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <div class="input-group">
+                    <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                    <span class="input-group-text">
+                        <i class="fas fa-envelope"></i>
+                    </span>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password">
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+                    <span class="input-group-text">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
             </div>
-            <p>Don't have an account? <a href="/signup" style="text-decoration: none;">Signup</a> here!</p>
-            <p>Go to <a href="/" style="text-decoration: none;">home</a> page.</p>
-            <button type="submit" class="btn btn-dark">Login</button>
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="remember">
+                <label class="form-check-label" for="remember">Remember me</label>
+            </div>
+            <button type="submit" class="btn btn-login">Sign In</button>
+            
+            <div class="divider">
+                <span>Or continue with</span>
+            </div>
+            
+            <div class="social-login">
+                <a href="#" class="social-btn google">
+                    <i class="fab fa-google"></i>
+                </a>
+                <a href="#" class="social-btn facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="social-btn twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+            </div>
         </form>
+        <div class="login-footer">
+            <p>Don't have an account? <a href="/signup">Sign up</a></p>
+            <p><a href="/forgot-password">Forgot your password?</a></p>
+        </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle password visibility
+        document.querySelector('.input-group-text').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Check if welcome message has been shown
+        if (!localStorage.getItem('welcomeShown')) {
+            // Clear any existing welcome message
+            const existingWelcome = document.querySelector('.welcome-message');
+            if (existingWelcome) existingWelcome.remove();
+            
+            // Show welcome message
+            const welcomeMessage = document.createElement('div');
+            welcomeMessage.className = 'welcome-message';
+            welcomeMessage.innerHTML = `
+                <div class="welcome-content">
+                    <div class="welcome-text">
+                        <h2>Welcome</h2>
+                        <div class="decorative-line left"></div>
+                        <div class="decorative-line right"></div>
+                    </div>
+                    <p>to AuraCart, your luxury shopping destination</p>
+                    <div class="welcome-features">
+                        <div class="feature"><i class="fas fa-gem"></i> Premium Products</div>
+                        <div class="feature"><i class="fas fa-truck"></i> Fast Delivery</div>
+                        <div class="feature"><i class="fas fa-shield-alt"></i> Secure Shopping</div>
+                    </div>
+                    <button class="welcome-btn">Start Shopping</button>
+                </div>
+            `;
+            document.body.appendChild(welcomeMessage);
+
+            // Remove any existing style element for welcome message
+            const existingStyle = document.querySelector('#welcome-style');
+            if (existingStyle) existingStyle.remove();
+
+            // Add styles for welcome message
+            const style = document.createElement('style');
+            style.id = 'welcome-style';
+            style.textContent = `
+                @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+                
+                .welcome-message {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(135deg, rgba(52, 21, 77, 0.98), rgba(30, 12, 48, 0.95));
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 9999;
+                    backdrop-filter: blur(10px);
+                }
+
+                .welcome-content {
+                    text-align: center;
+                    color: white;
+                    max-width: 600px;
+                    padding: 3rem;
+                    animation: scaleIn 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+                    position: relative;
+                    background: rgba(0, 0, 0, 0.2);
+                    border-radius: 20px;
+                    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+                    border: 1px solid rgba(212, 175, 55, 0.3);
+                    overflow: hidden;
+                }
+                
+                .welcome-content::before {
+                    content: '';
+                    position: absolute;
+                    top: -50%;
+                    left: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 60%);
+                    z-index: -1;
+                }
+                
+                .welcome-text {
+                    position: relative;
+                    margin-bottom: 2rem;
+                    padding: 2rem 0;
+                }
+                
+                .welcome-text::before,
+                .welcome-text::after {
+                    content: '';
+                    position: absolute;
+                    width: 100px;
+                    height: 2px;
+                    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.7), transparent);
+                }
+                
+                .welcome-text::before {
+                    top: 0;
+                    left: 50%;
+                    transform: translateX(-50%);
+                }
+                
+                .welcome-text::after {
+                    bottom: 0;
+                    left: 50%;
+                    transform: translateX(-50%);
+                }
+                
+                .decorative-line {
+                    position: absolute;
+                    top: 50%;
+                    width: 100px;
+                    height: 1px;
+                    background: linear-gradient(90deg, rgba(212, 175, 55, 0.7), transparent);
+                }
+                
+                .decorative-line.left {
+                    left: -110px;
+                }
+                
+                .decorative-line.right {
+                    right: -110px;
+                    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.7));
+                }
+
+                .welcome-content h2 {
+                    font-family: 'Great Vibes', cursive;
+                    font-size: 7rem;
+                    font-weight: 400;
+                    margin-bottom: 0.5rem;
+                    background: linear-gradient(to right, #F5E487, #D4AF37, #E6C65C, #FFD700, #BF953F);
+                    background-size: 200% auto;
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+                    letter-spacing: 5px;
+                    position: relative;
+                    display: inline-block;
+                    animation: goldShine 3s ease-in-out infinite;
+                    transform-origin: center center;
+                }
+
+                .welcome-content p {
+                    font-family: var(--font-primary);
+                    font-size: 1.4rem;
+                    opacity: 0.9;
+                    margin-bottom: 2.5rem;
+                    animation: slideUp 0.5s ease-out 0.2s backwards;
+                    color: rgba(255, 255, 255, 0.9);
+                }
+
+                .welcome-features {
+                    display: flex;
+                    justify-content: center;
+                    gap: 2rem;
+                    margin-bottom: 2.5rem;
+                    flex-wrap: wrap;
+                }
+
+                .feature {
+                    display: flex;
+                    align-items: center;
+                    font-size: 1.1rem;
+                    animation: slideUp 0.5s ease-out 0.4s backwards;
+                    opacity: 0.9;
+                }
+
+                .feature i {
+                    margin-right: 0.8rem;
+                    color: #F5E487;
+                    font-size: 1.3rem;
+                    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+                }
+
+                .welcome-btn {
+                    background: linear-gradient(45deg, #D4AF37, #F5E487, #BF953F);
+                    background-size: 200% auto;
+                    color: #1E0C30;
+                    border: none;
+                    border-radius: 50px;
+                    padding: 1rem 3rem;
+                    font-size: 1.2rem;
+                    font-weight: 700;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    animation: slideUp 0.5s ease-out 0.6s backwards, buttonGlow 3s infinite;
+                    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+                    position: relative;
+                    overflow: hidden;
+                    letter-spacing: 1px;
+                }
+
+                .welcome-btn:hover {
+                    transform: translateY(-5px) scale(1.05);
+                    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5);
+                    background-position: right center;
+                }
+                
+                .welcome-btn::before {
+                    content: '';
+                    position: absolute;
+                    top: -50%;
+                    left: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: rgba(255, 255, 255, 0.1);
+                    transform: rotate(45deg);
+                    animation: shine 3s linear infinite;
+                }
+
+                @keyframes fadeOut {
+                    to { opacity: 0; visibility: hidden; }
+                }
+
+                @keyframes slideUp {
+                    from { transform: translateY(50px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+                
+                @keyframes scaleIn {
+                    from { transform: scale(0.8); opacity: 0; }
+                    to { transform: scale(1); opacity: 1; }
+                }
+                
+                @keyframes goldShine {
+                    0%, 100% { 
+                        background-position: 0% 50%;
+                        text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+                        transform: scale(1);
+                    }
+                    50% { 
+                        background-position: 100% 50%;
+                        text-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+                        transform: scale(1.05);
+                    }
+                }
+                
+                @keyframes buttonGlow {
+                    0%, 100% {
+                        background-position: 0% 50%;
+                        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+                    }
+                    50% {
+                        background-position: 100% 50%;
+                        box-shadow: 0 4px 30px rgba(212, 175, 55, 0.7);
+                    }
+                }
+                
+                @keyframes shine {
+                    from {
+                        transform: rotate(45deg) translate(-100%, -100%);
+                    }
+                    to {
+                        transform: rotate(45deg) translate(100%, 100%);
+                    }
+                }
+                
+                @media (max-width: 768px) {
+                    .welcome-content h2 {
+                        font-size: 5rem;
+                    }
+                    
+                    .welcome-features {
+                        flex-direction: column;
+                        gap: 1rem;
+                        align-items: center;
+                    }
+                    
+                    .welcome-content {
+                        padding: 2rem;
+                        margin: 1rem;
+                    }
+                    
+                    .decorative-line.left,
+                    .decorative-line.right {
+                        display: none;
+                    }
+                }
+                
+                @media (max-width: 480px) {
+                    .welcome-content h2 {
+                        font-size: 4rem;
+                    }
+                    
+                    .welcome-content p {
+                        font-size: 1.2rem;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Force the welcome message to be visible
+            welcomeMessage.style.display = 'flex';
+
+            // Close welcome message when button is clicked
+            document.querySelector('.welcome-btn').addEventListener('click', function() {
+                document.querySelector('.welcome-message').style.animation = 'fadeOut 0.5s forwards';
+                setTimeout(() => {
+                    const msg = document.querySelector('.welcome-message');
+                    if (msg) msg.remove();
+                }, 500);
+            });
+
+            // Set welcome message as shown
+            localStorage.setItem('welcomeShown', 'true');
+            
+            // Force reload of styles
+            document.body.offsetHeight;
+        }
+    </script>
 </body>
 
 </html>

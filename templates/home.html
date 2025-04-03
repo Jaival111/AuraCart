@@ -10,7 +10,7 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', path='css/carousel.css') }}">
     <title>AuraCart | Elegant Shopping Experience</title>
@@ -1209,7 +1209,7 @@
             color: var(--primary-color);
         }
 
-        /* Welcome Overlay */
+        /* Welcome Overlay - Updated Modern Style */
         .welcome-overlay {
             position: fixed;
             top: 0;
@@ -1219,7 +1219,7 @@
             display: none;
             align-items: center;
             justify-content: center;
-            background-color: rgba(52, 21, 77, 0.98);
+            background-color: #321348;
             z-index: 99999;
             color: var(--light-text);
             text-align: center;
@@ -1238,54 +1238,97 @@
             transform: translate(-50%, -50%);
             width: 90%;
             max-width: 800px;
-            animation: none;
+            animation: fadeIn 1s ease-out;
             opacity: 1;
         }
         
         .welcome-title {
-            font-size: 5rem;
+            font-family: 'Great Vibes', cursive;
+            font-size: 7rem;
+            font-weight: 400;
             margin-bottom: 1.5rem;
-            font-weight: 800;
-            color: white;
-            font-family: var(--font-heading);
-            letter-spacing: -1px;
+            background: linear-gradient(to right, #D4AF37, #FBD341, #F0C16B, #D4AF37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+            letter-spacing: 2px;
             line-height: 1.2;
-            text-shadow: 0 0 20px rgba(157, 78, 221, 0.5);
+            animation: goldShimmer 4s ease-in-out infinite;
+            position: relative;
         }
         
         .welcome-subtitle {
-            font-size: 2rem;
-            opacity: 0.9;
-            font-family: var(--font-heading);
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.9);
-            margin-top: 1rem;
+            font-size: 2.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            margin-bottom: 3rem;
+            color: rgba(255, 255, 255, 0.85);
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }
         
         .welcome-close {
             display: inline-block;
-            background: rgba(157, 78, 221, 0.3);
-            color: var(--light-text);
-            border: 1px solid rgba(157, 78, 221, 0.5);
-            padding: 0.8rem 2rem;
-            border-radius: 30px;
-            font-size: 1rem;
+            background: linear-gradient(to right, #D4AF37, #FBD341);
+            color: #321348;
+            border: none;
+            border-radius: 4px;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
             font-weight: 600;
             margin-top: 1rem;
             cursor: pointer;
             transition: var(--transition);
+            letter-spacing: 1px;
+            font-family: var(--font-heading);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
         }
         
         .welcome-close:hover {
-            background: rgba(157, 78, 221, 0.5);
             transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5);
         }
         
-        @keyframes fadeInOut {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            80% { opacity: 1; }
-            100% { opacity: 0; }
+        @keyframes goldShimmer {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 3.5rem;
+            }
+            
+            .welcome-subtitle {
+                font-size: 1.4rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .welcome-title {
+                font-size: 2.5rem;
+            }
+            
+            .welcome-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .welcome-close {
+                padding: 0.8rem 2rem;
+                font-size: 1rem;
+            }
         }
 
         /* Additional Accents */
@@ -1576,8 +1619,9 @@
 <body>
     <div class="welcome-overlay">
         <div class="welcome-content">
-            <h1 class="welcome-title">Welcome to AuraCart</h1>
-            <p class="welcome-subtitle">Discover a New Shopping Experience</p>
+            <h1 class="welcome-title">Welcome</h1>
+            <p class="welcome-subtitle">to AuraCart</p>
+            <button class="welcome-close">Get Started</button>
         </div>
     </div>
 
@@ -1981,10 +2025,16 @@
                 setTimeout(() => {
                     showWelcomeMessage();
                 }, 300);
+                
+                // Remove this to allow showing on every page load
+                // localStorage.setItem('welcomeShown', 'true');
             } else {
                 // Hide the welcome message immediately if it's a page reload
                 welcomeOverlay.style.display = 'none';
             }
+            
+            // Add click event for close button
+            document.querySelector('.welcome-close').addEventListener('click', hideWelcomeMessage);
         });
         
         // Function to show welcome message
@@ -1999,9 +2049,6 @@
             setTimeout(() => {
                 welcomeOverlay.classList.add('active');
             }, 10);
-            
-            // Auto-hide after exactly 3 seconds
-            setTimeout(hideWelcomeMessage, 3000);
         }
         
         // Function to hide welcome message

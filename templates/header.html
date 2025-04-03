@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg">
+<nav class="navbar navbar-expand-lg" style="background: linear-gradient(135deg, #34154D 0%, #4A1D6A 100%); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
     <div class="container-fluid px-4">
         <a class="navbar-brand fw-light" href="/" style="letter-spacing: 2px; color: #F8F4E3; font-family: 'Playfair Display', serif; font-size: 1.8rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">AURACART</a>
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
@@ -14,11 +14,20 @@
                 <li class="nav-item">
                     <a class="nav-link fw-light" href="/login" style="color: #F8F4E3; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">Login</a>
                 </li>
+                <!-- Remove Categories and Deals navigation items -->
+                <!-- <li class="nav-item">
+                    <a class="nav-link" href="#">Categories</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Deals</a>
+                </li> -->
             </ul>
-            <form class="d-flex align-items-center" role="search" method="post">
-                <input class="form-control me-2 border-0 search-bar" type="search" name="search" placeholder="Search products..." aria-label="Search">
-                <button class="btn border-0 d-flex justify-content-center align-items-center me-3" type="submit" style="background-color: #F8F4E3; border: 2px solid #F8F4E3;">
-                    <img src="{{ url_for('static', path='search.png') }}" alt="search" style="width: 16px; height: 16px; filter: invert(0); opacity: 0.8;">
+            <form class="d-flex align-items-center" role="search" method="post" action="/search">
+                <div class="position-relative me-2">
+                    <input class="form-control search-bar" type="search" name="search" placeholder="Search products..." aria-label="Search">
+                </div>
+                <button class="btn search-button me-3" type="submit">
+                    <i class="fas fa-search" style="color: white; font-size: 14px;"></i>
                 </button>
                 <div class="cart-wrapper position-relative" style="margin-right: 1rem;">
                     <a href="/cart" class="cart-icon d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(248, 244, 227, 0.2); border-radius: 50%; text-decoration: none;">
@@ -34,12 +43,95 @@
 </nav>
 
 <style>
+:root {
+    --primary-color: #34154D;
+    --secondary-color: #9D4EDD;
+    --accent-color: #E76F51;
+    --background-color: #F5F7FA;
+    --dark-bg: #22112E;
+    --light-text: #FFFFFF;
+    --dark-text: #2D2D2D;
+    --subtle-text: #4A5568;
+    --border-radius: 12px;
+    --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    --gradient-primary: linear-gradient(135deg, #9D4EDD 0%, #34154D 100%);
+    --gradient-accent: linear-gradient(135deg, #E76F51 0%, #F4A261 100%);
+    --violet-gradient: linear-gradient(135deg, #34154D 0%, #9D4EDD 100%);
+    --font-primary: 'Inter', sans-serif;
+    --font-heading: 'Montserrat', sans-serif;
+}
+
+.navbar {
+    background: linear-gradient(135deg, #34154D 0%, #4A1D6A 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 0.8rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-brand {
+    letter-spacing: 2px; 
+    color: #F8F4E3; 
+    font-family: 'Playfair Display', serif; 
+    font-size: 1.8rem; 
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    transition: var(--transition);
+}
+
+.navbar-brand:hover {
+    color: #FFF;
+    transform: translateY(-2px);
+}
+
+.nav-link {
+    color: #F8F4E3 !important; 
+    letter-spacing: 1px; 
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    font-weight: 500 !important;
+    padding: 0.5rem 1rem !important;
+    transition: var(--transition);
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background: var(--accent-color);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
+    width: 70%;
+}
+
+.nav-link:hover {
+    color: #FFF !important;
+}
+
+.nav-link.active::after {
+    width: 70%;
+}
+
 .cart-icon {
-    transition: transform 0.3s ease;
+    width: 40px; 
+    height: 40px; 
+    background: rgba(248, 244, 227, 0.15); 
+    border-radius: 50%; 
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .cart-icon:hover {
     transform: scale(1.1);
+    background: rgba(248, 244, 227, 0.25);
 }
 
 .cart-count {
@@ -50,17 +142,70 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background: var(--accent-color) !important;
+    border: 2px solid #fff;
 }
 
 .search-bar {
-    background: rgba(248, 244, 227, 0.4);
-    border: 1px solid rgba(248, 244, 227, 0.3);
-    border-radius: 20px;
-    padding: 0.5rem 1rem;
-    width: 300px;
-    color: #1a0533;
+    background: rgba(248, 244, 227, 0.15);
+    border: 1px solid rgba(248, 244, 227, 0.2) !important;
+    border-radius: 50px !important;
+    padding: 0.6rem 1.2rem !important;
+    width: 260px;
+    color: #fff !important;
     font-size: 0.9rem;
     transition: all 0.3s ease;
     backdrop-filter: blur(5px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.search-bar::placeholder {
+    color: rgba(248, 244, 227, 0.7);
+}
+
+.search-bar:focus {
+    background: rgba(248, 244, 227, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 280px;
+}
+
+.search-button {
+    background-color: var(--accent-color) !important;
+    color: white !important;
+    border-radius: 50% !important;
+    width: 38px;
+    height: 38px;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
+}
+
+.search-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background-color: #ff8566 !important;
+}
+
+@media (max-width: 992px) {
+    .search-bar {
+        width: 200px;
+    }
+    
+    .search-bar:focus {
+        width: 220px;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1.5rem;
+    }
+    
+    .search-bar {
+        width: 100%;
+    }
 }
 </style>
