@@ -13,7 +13,7 @@
         position: relative;
         overflow: hidden;
     }
-    
+
     .product-card::after {
         content: '';
         position: absolute;
@@ -21,22 +21,22 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(to bottom, rgba(255,255,255,0) 60%, rgba(245,245,250,0.5) 100%);
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 60%, rgba(245, 245, 250, 0.5) 100%);
         opacity: 0;
         transition: opacity 0.5s ease;
         pointer-events: none;
     }
-    
+
     .product-card:hover {
         transform: translateY(-8px);
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
         border-color: rgba(26, 5, 51, 0.08);
     }
-    
+
     .product-card:hover::after {
         opacity: 1;
     }
-    
+
     .card {
         height: 100%;
         display: flex;
@@ -49,7 +49,7 @@
         z-index: 1;
         overflow: hidden;
     }
-    
+
     .product-image {
         width: 100%;
         height: 260px;
@@ -63,7 +63,7 @@
         position: relative;
         overflow: hidden;
     }
-    
+
     .product-image::after {
         content: '';
         position: absolute;
@@ -71,10 +71,10 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, rgba(248,249,252,0) 70%);
+        background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, rgba(248, 249, 252, 0) 70%);
         pointer-events: none;
     }
-    
+
     .product-image img {
         max-height: 100%;
         max-width: 100%;
@@ -82,11 +82,11 @@
         transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
         filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.05));
     }
-    
+
     .product-card:hover .product-image img {
         transform: scale(1.08);
     }
-    
+
     .product-title {
         font-size: 1.15rem;
         margin-bottom: 0.75rem;
@@ -101,7 +101,7 @@
         font-family: 'Playfair Display', serif;
         letter-spacing: 0.2px;
     }
-    
+
     .card-text {
         color: #555;
         font-size: 0.95rem;
@@ -114,13 +114,13 @@
         margin-bottom: 1rem;
         color: #666;
     }
-    
+
     .price-container {
         display: flex;
         align-items: baseline;
         margin: 0.75rem 0 1.25rem;
     }
-    
+
     .discounted-price {
         font-size: 1.5rem;
         font-weight: 600;
@@ -128,13 +128,13 @@
         margin-right: 0.75rem;
         font-family: 'Playfair Display', serif;
     }
-    
+
     .original-price {
         font-size: 1rem;
         color: #999;
         text-decoration: line-through;
     }
-    
+
     .discount-badge {
         display: inline-block;
         background: rgba(255, 182, 193, 0.15);
@@ -146,7 +146,7 @@
         margin-left: 0.5rem;
         border: 1px solid rgba(224, 76, 89, 0.2);
     }
-    
+
     .view-details-btn {
         background: linear-gradient(to right, #1a0533, #360d6a);
         color: #FFFFFF;
@@ -164,7 +164,7 @@
         overflow: hidden;
         letter-spacing: 0.5px;
     }
-    
+
     .view-details-btn::before {
         content: '';
         position: absolute;
@@ -172,25 +172,25 @@
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
         transition: 0.5s;
     }
-    
+
     .view-details-btn:hover {
         box-shadow: 0 6px 20px rgba(26, 5, 51, 0.25);
         transform: translateY(-2px);
     }
-    
+
     .view-details-btn:hover::before {
         left: 100%;
     }
-    
+
     .carousel-container {
         position: relative;
         padding: 0 120px;
         margin: 3rem 0;
     }
-    
+
     .carousel-inner {
         display: flex;
         overflow-x: hidden;
@@ -198,7 +198,7 @@
         gap: 2.5rem;
         padding: 2rem 0;
     }
-    
+
     .carousel-control-prev,
     .carousel-control-next {
         position: absolute;
@@ -217,27 +217,27 @@
         transition: all 0.3s ease;
         border: 1px solid rgba(26, 5, 51, 0.05);
     }
-    
+
     .carousel-control-prev-icon,
     .carousel-control-next-icon {
         filter: invert(1) brightness(0.2) !important;
         width: 1.2rem;
         height: 1.2rem;
     }
-    
+
     .carousel-control-prev:hover,
     .carousel-control-next:hover {
         background: rgba(26, 5, 51, 0.05);
     }
-    
+
     .carousel-control-prev {
         left: 40px;
     }
-    
+
     .carousel-control-next {
         right: 40px;
     }
-    
+
     .products-row {
         display: flex;
         flex-wrap: nowrap;
@@ -246,41 +246,61 @@
         gap: 2.5rem;
         min-height: 620px;
     }
-    
+
     .card-body {
         flex: 1;
         display: flex;
         flex-direction: column;
         padding: 0.5rem 0.25rem !important;
     }
-    
+
     /* Animation for Add to Cart */
     @keyframes dropToCart {
         0% {
             transform: scale(1) rotate(0deg);
             opacity: 1;
         }
+
         50% {
             transform: scale(0.8) rotate(10deg) translateY(-30px);
             opacity: 0.8;
         }
+
         100% {
             transform: scale(0) rotate(-5deg) translateY(20px);
             opacity: 0;
         }
     }
-    
+
     @keyframes bounce {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.15); }
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.15);
+        }
     }
-    
+
     @keyframes pop {
-        0% { transform: scale(0.8); opacity: 0.8; }
-        70% { transform: scale(1.2); opacity: 1; }
-        100% { transform: scale(1); opacity: 1; }
+        0% {
+            transform: scale(0.8);
+            opacity: 0.8;
+        }
+
+        70% {
+            transform: scale(1.2);
+            opacity: 1;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
     }
-    
+
     .cart-item-animation {
         position: fixed;
         z-index: 9999;
@@ -298,109 +318,111 @@
 
 <div class="container">
     <div id="carousel{{category}}" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
-        {% for product_list in product_ %}
-                <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
-                    <div class="products-row">
-                {% for product in product_list %}
-                        <div class="product-card">
-                            <div class="card">
-                                <div class="product-image">
-                                    <img src="{{product.img_link}}" alt="{{product.product_name}}">
+        <div class="carousel-inner">
+            {% for product_list in product_ %}
+            <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
+                <div class="products-row">
+                    {% for product in product_list %}
+                    <div class="product-card">
+                        <div class="card">
+                            <div class="product-image">
+                                <img src="{{product.img_link}}" alt="{{product.product_name}}">
+                            </div>
+                            <div class="card-body">
+                                <h5 class="product-title">{{product.product_name[:50]}}{% if product.product_name|length
+                                    > 50 %}...{% endif %}</h5>
+                                <p class="card-text">{{product.about_product[:100]}}{% if product.about_product|length >
+                                    100 %}...{% endif %}</p>
+
+                                <div class="price-container">
+                                    <span class="discounted-price">{{product.discounted_price}}</span>
+                                    <span class="original-price">{{product.actual_price}}</span>
+                                    <span class="discount-badge">-{{product.discount_percentage}}</span>
                                 </div>
-                    <div class="card-body">
-                                    <h5 class="product-title">{{product.product_name[:50]}}{% if product.product_name|length > 50 %}...{% endif %}</h5>
-                                    <p class="card-text">{{product.about_product[:100]}}{% if product.about_product|length > 100 %}...{% endif %}</p>
-                                    
-                                    <div class="price-container">
-                                        <span class="discounted-price">{{product.discounted_price}}</span>
-                                        <span class="original-price">{{product.actual_price}}</span>
-                                        <span class="discount-badge">-{{product.discount_percentage}}</span>
+
+                                <a href="/product-{{product.product_id}}" class="view-details-btn">View Details</a>
+                            </div>
+                        </div>
                     </div>
-                                    
-                                    <a href="/product-{{product.product_id}}" class="view-details-btn">View Details</a>
-        </div>
-                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{category}}" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carousel{{category}}" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{category}}" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carousel{{category}}" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-    </button>
-</div>
 </div>
 
 <script>
-function addToCartWithAnimation(card, imgSrc, productId) {
-    // Create the floating item element
-    const item = document.createElement('div');
-    item.className = 'cart-item-animation';
-    item.style.backgroundImage = `url(${imgSrc})`;
-    
-    // Get positions
-    const cardRect = card.getBoundingClientRect();
-    const cartIcon = document.querySelector('.cart-icon');
-    const cartRect = cartIcon.getBoundingClientRect();
-    
-    // Position the item at the card's center
-    const startX = cardRect.left + (cardRect.width / 2) - 30; // 30 is half the item width
-    const startY = cardRect.top + (cardRect.height / 2) - 30; // 30 is half the item height
-    
-    item.style.top = `${startY}px`;
-    item.style.left = `${startX}px`;
-    document.body.appendChild(item);
-    
-    // Calculate the path to the cart
-    const xDistance = cartRect.left - startX + (cartRect.width / 2);
-    const yDistance = cartRect.top - startY + (cartRect.height / 2);
-    
-    // Animate the item
-    item.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-    item.style.animation = 'dropToCart 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-    item.style.transform = `translate(${xDistance}px, ${yDistance}px) scale(0)`;
-    
-    // Add a small bounce animation to the cart icon
-    cartIcon.style.animation = 'none';
-    cartIcon.offsetHeight; // Trigger reflow
-    cartIcon.style.animation = 'bounce 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) 0.5s';
-    
-    // Remove the animation element after it's done
-    setTimeout(() => {
-        item.remove();
-        // Here you would typically make an API call to add the item to cart
-        fetch('/add-to-cart', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ productId: productId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Update cart count or show success message
-            if (data.success) {
-                updateCartCount(data.cartCount);
-            }
-        });
-    }, 800);
-}
+    function addToCartWithAnimation(card, imgSrc, productId) {
+        // Create the floating item element
+        const item = document.createElement('div');
+        item.className = 'cart-item-animation';
+        item.style.backgroundImage = `url(${imgSrc})`;
 
-function updateCartCount(count) {
-    const cartCount = document.querySelector('.cart-count');
-    if (cartCount) {
-        cartCount.textContent = count;
-        cartCount.style.animation = 'none';
-        cartCount.offsetHeight; // Trigger reflow
-        cartCount.style.animation = 'pop 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        // Get positions
+        const cardRect = card.getBoundingClientRect();
+        const cartIcon = document.querySelector('.cart-icon');
+        const cartRect = cartIcon.getBoundingClientRect();
+
+        // Position the item at the card's center
+        const startX = cardRect.left + (cardRect.width / 2) - 30; // 30 is half the item width
+        const startY = cardRect.top + (cardRect.height / 2) - 30; // 30 is half the item height
+
+        item.style.top = `${startY}px`;
+        item.style.left = `${startX}px`;
+        document.body.appendChild(item);
+
+        // Calculate the path to the cart
+        const xDistance = cartRect.left - startX + (cartRect.width / 2);
+        const yDistance = cartRect.top - startY + (cartRect.height / 2);
+
+        // Animate the item
+        item.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        item.style.animation = 'dropToCart 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        item.style.transform = `translate(${xDistance}px, ${yDistance}px) scale(0)`;
+
+        // Add a small bounce animation to the cart icon
+        cartIcon.style.animation = 'none';
+        cartIcon.offsetHeight; // Trigger reflow
+        cartIcon.style.animation = 'bounce 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) 0.5s';
+
+        // Remove the animation element after it's done
+        setTimeout(() => {
+            item.remove();
+            // Here you would typically make an API call to add the item to cart
+            fetch('/add-to-cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId: productId })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Update cart count or show success message
+                    if (data.success) {
+                        updateCartCount(data.cartCount);
+                    }
+                });
+        }, 800);
     }
-}
+
+    function updateCartCount(count) {
+        const cartCount = document.querySelector('.cart-count');
+        if (cartCount) {
+            cartCount.textContent = count;
+            cartCount.style.animation = 'none';
+            cartCount.offsetHeight; // Trigger reflow
+            cartCount.style.animation = 'pop 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        }
+    }
 </script>
 {% endmacro %}

@@ -7,9 +7,14 @@ from pydantic import BaseModel
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from config.database import userdb
+from config.database import userdb, get_cart_count, get_cart
+import os
+from dotenv import load_dotenv
+import pandas as pd
 
-SECRET_KRY = "46370533e87b707085cd5412f6423bb3ed581d13365e56683ec2b02459852988"
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -49,7 +54,7 @@ def get_password_hashed(password):
     return pwd_context.hash(password)
 
 
-def get_user(db, username):
+def get_user(db, username: str):
     user_data = db.find_one({"username": username})
     if user_data:
         return UserInDB(**user_data)
@@ -72,25 +77,27 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     else:
         expire = datetime.now() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KRY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     try:
-        payload = jwt.decode(token, SECRET_KRY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    
-    user = get_user(userdb, username=token_data.username)
+    user = get_user(userdb, token_data.username)
     if user is None:
         raise credentials_exception
-    
     return user
 
 
@@ -111,7 +118,6 @@ async def signup(request: Request):
 
 
 def create_user(db, username: str, email: str, password: str):
-    # Check if user already exists
     existing_user = db.find_one({"username": username})
     if existing_user:
         return False
@@ -127,7 +133,7 @@ def create_user(db, username: str, email: str, password: str):
     return True
 
 
-@authenticator.post("/token")
+@authenticator.post("/")
 async def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(userdb, form_data.username, form_data.password)
     if not user:
@@ -135,15 +141,38 @@ async def login_for_access_token(request: Request, form_data: OAuth2PasswordRequ
             "login.html",
             {"request": request, "error": "Incorrect username or password"}
         )
+    
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
+    
+    # Get the same data as server.py
+    num_of_products = 20
+    chunk_size = 4
+
+    df["rating"] = df["rating"].apply(lambda x: float(x))
+    top_products = df[df["rating"] >= 4]
+    random_top_products = top_products.sample(n=num_of_products).to_dict(orient="records")
+    data_top_products = [random_top_products[i:i+chunk_size] for i in range(0, len(random_top_products), chunk_size)]
+
     response = templates.TemplateResponse(
         "home.html",
-        {"request": request, "user": user.username}
+        {
+            "request": request,
+            "user": user,
+            "top_products": data_top_products,
+            "cart_count": get_cart_count(user.username)
+        }
     )
-    response.set_cookie(key="access_token", value=f"Bearer {access_token}")
+    response.set_cookie(
+        key="access_token",
+        value=f"Bearer {access_token}",
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    )
     return response
 
 
@@ -172,19 +201,49 @@ async def register_user(request: Request):
         )
 
 
-@authenticator.get('/home', response_class=HTMLResponse)
+df = pd.read_csv("amazon.csv")
+
+@authenticator.get('/', response_class=HTMLResponse)
 async def home(request: Request):
     try:
         token = request.cookies.get("access_token")
         if token and token.startswith("Bearer "):
             token = token.split(" ")[1]
-            payload = jwt.decode(token, SECRET_KRY, algorithms=[ALGORITHM])
-            username = payload.get("sub")
-            if username:
-                return templates.TemplateResponse("home.html", {"request": request, "user": username})
-    except:
-        pass
-    return templates.TemplateResponse("home.html", {"request": request, "user": None})
+            try:
+                payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+                username = payload.get("sub")
+                if username:
+                    # Get the same data as server.py
+                    num_of_products = 20
+                    chunk_size = 4
+
+                    df["rating"] = df["rating"].apply(lambda x: float(x))
+                    top_products = df[df["rating"] >= 4]
+                    random_top_products = top_products.sample(n=num_of_products).to_dict(orient="records")
+                    data_top_products = [random_top_products[i:i+chunk_size] for i in range(0, len(random_top_products), chunk_size)]
+                    
+                    # Get complete user data from database
+                    user = get_user(userdb, username)
+                    cart_count = get_cart_count(username)
+                    
+                    if user:
+                        return templates.TemplateResponse("home.html", {
+                            "request": request, 
+                            "user": user, 
+                            "top_products": data_top_products,
+                            "cart_count": cart_count
+                        })
+            except JWTError:
+                pass
+    except Exception as e:
+        print(f"Error in home route: {str(e)}")
+    
+    return templates.TemplateResponse("home.html", {
+        "request": request, 
+        "user": None,
+        "top_products": [],
+        "cart_count": 0
+    })
 
 
 @authenticator.get('/logout')

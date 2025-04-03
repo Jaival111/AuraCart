@@ -1570,6 +1570,69 @@
             color: var(--subtle-text);
             font-weight: 500;
         }
+
+        .category-products {
+            background-color: var(--background-color);
+        }
+        .category-section {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--gradient-primary);
+        }
+        .product-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: var(--transition);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow);
+        }
+        .product-image {
+            height: 200px;
+            overflow: hidden;
+        }
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .product-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark-text);
+        }
+        .product-price {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
     </style>
 </head>
 
@@ -1797,7 +1860,7 @@
                         <p class="section-subtitle">Discover our best-selling products loved by customers worldwide</p>
                     </div>
                     <div class="animate-on-scroll">
-        {{ carousel_.carousel(top_products, "top") }}
+                        {{ carousel_.carousel(top_products, "top") }}
                     </div>
                 </div>
             </section>
@@ -2179,6 +2242,8 @@
             floatingElements[3].setAttribute('data-speed', '1.0');
         });
     </script>
-</body>
 
+
+net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

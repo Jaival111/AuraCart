@@ -639,9 +639,13 @@
                     </div>
 
                     <div class="product-actions">
-                        <button onclick="addToCartWithAnimation(this, '{{product.img_link}}', '{{product.product_id}}')" class="add-to-cart-btn">
-                            Add to Cart
-                        </button>
+                        {% if user %}
+                            <button class="add-to-cart-btn" data-product-id="{{ product.product_id }}">
+                                Add to Cart
+                            </button>
+                        {% else %}
+                            <a href="/login" class="add-to-cart-btn">Login to Add to Cart</a>
+                        {% endif %}
 
                         <div class="specifications">
                             <h3 class="spec-title">Product Specifications</h3>
@@ -665,5 +669,44 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addToCartButton = document.querySelector('.add-to-cart-btn');
+        
+        if (addToCartButton) {
+            addToCartButton.addEventListener('click', async function() {
+                const productId = this.dataset.productId;
+                if (!productId) return; // Skip if it's the login link
+                
+                try {
+                    const response = await fetch(`/add-to-cart/${productId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        // Update cart count in header
+                        const cartCount = document.querySelector('.cart-count');
+                        if (cartCount) {
+                            const currentCount = parseInt(cartCount.textContent) || 0;
+                            cartCount.textContent = currentCount + 1;
+                        }
+                        
+                        // Show success message
+                        alert('Item added to cart successfully!');
+                    } else {
+                        alert('Please login to add items to cart');
+                        window.location.href = '/login';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while adding to cart');
+                }
+            });
+        }
+    });
+    </script>
 </body>
 </html>

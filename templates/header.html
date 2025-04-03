@@ -13,7 +13,7 @@
                 </li>
                 {% if user %}
                     <li class="nav-item">
-                        <span class="nav-link fw-light" style="color: #F8F4E3; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">Welcome, {{ user }}</span>
+                        <span class="nav-link fw-light" style="color: #F8F4E3; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">Welcome, {{ user.username }}</span>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link fw-light" href="/logout" style="color: #F8F4E3; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">Logout</a>
@@ -34,7 +34,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#F8F4E3" class="bi bi-cart" viewBox="0 0 16 16">
                             <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
                         </svg>
-                        <span class="cart-count position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                        <span class="cart-count position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ cart_count }}</span>
                     </a>
                 </div>
             </form>

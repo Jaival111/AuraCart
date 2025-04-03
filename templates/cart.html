@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - AuraCart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .cart-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .cart-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .remove-item {
+            color: #dc3545;
+            cursor: pointer;
+        }
+        .cart-summary {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    {% include "header.html" %}
+
+    <div class="container py-5">
+        <h1 class="mb-4">Your Shopping Cart</h1>
+        
+        {% if cart_items %}
+            <div class="row">
+                <div class="col-md-8">
+                    {% for item in cart_items %}
+                        <div class="cart-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    <img src="{{ item.img_link }}" alt="{{ item.product_name }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <h5>{{ item.product_name }}</h5>
+                                    <div class="text-muted">₹{{ item.discounted_price }}</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="quantity-controls">
+                                        <button class="btn btn-sm btn-outline-secondary decrease-quantity" data-product-id="{{ item.product_id }}">-</button>
+                                        <span class="quantity">{{ item.quantity }}</span>
+                                        <button class="btn btn-sm btn-outline-secondary increase-quantity" data-product-id="{{ item.product_id }}">+</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <div class="fw-bold">₹{{ item.discounted_price * item.quantity }}</div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="cart-item-actions">
+                                        <button class="remove-item-btn" data-product-id="{{ item.product_id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <div class="cart-summary">
+                        <h4>Order Summary</h4>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <span class="subtotal-amount">₹{{ "%.2f"|format(cart_items|sum(attribute='discounted_price')|float) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Shipping</span>
+                            <span class="shipping-amount">Free</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="fw-bold">Total</span>
+                            <span class="total-amount">₹{{ "%.2f"|format(cart_items|sum(attribute='discounted_price')|float) }}</span>
+                        </div>
+                        <button class="btn btn-primary w-100">Proceed to Checkout</button>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-shopping-cart fa-3x mb-3 text-muted"></i>
+                <h3>Your cart is empty</h3>
+                <p class="text-muted">Looks like you haven't added any items to your cart yet.</p>
+                <a href="/" class="btn btn-primary">Continue Shopping</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const removeButtons = document.querySelectorAll('.remove-item-btn');
+        const decreaseButtons = document.querySelectorAll('.decrease-quantity');
+        const increaseButtons = document.querySelectorAll('.increase-quantity');
+        
+        // Handle quantity decrease
+        decreaseButtons.forEach(button => {
+            button.addEventListener('click', async function() {
+                const productId = this.dataset.productId;
+                const quantitySpan = this.nextElementSibling;
+                const currentQuantity = parseInt(quantitySpan.textContent);
+                
+                if (currentQuantity > 1) {
+                    try {
+                        const response = await fetch(`/update-cart/${productId}?quantity=${currentQuantity - 1}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            quantitySpan.textContent = currentQuantity - 1;
+                            updateOrderSummary();
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('An error occurred while updating quantity');
+                    }
+                }
+            });
+        });
+        
+        // Handle quantity increase
+        increaseButtons.forEach(button => {
+            button.addEventListener('click', async function() {
+                const productId = this.dataset.productId;
+                const quantitySpan = this.previousElementSibling;
+                const currentQuantity = parseInt(quantitySpan.textContent);
+                
+                try {
+                    const response = await fetch(`/update-cart/${productId}?quantity=${currentQuantity + 1}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        quantitySpan.textContent = currentQuantity + 1;
+                        updateOrderSummary();
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating quantity');
+                }
+            });
+        });
+        
+        // Handle item removal
+        removeButtons.forEach(button => {
+            button.addEventListener('click', async function() {
+                const productId = this.dataset.productId;
+                const cartItem = this.closest('.cart-item');
+                
+                try {
+                    const response = await fetch(`/remove-from-cart/${productId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        cartItem.remove();
+                        updateOrderSummary();
+                        
+                        // Update cart count in header
+                        const cartCount = document.querySelector('.cart-count');
+                        if (cartCount) {
+                            const currentCount = parseInt(cartCount.textContent) || 0;
+                            cartCount.textContent = currentCount - 1;
+                        }
+                        
+                        // Show empty cart message if needed
+                        if (document.querySelectorAll('.cart-item').length === 0) {
+                            document.querySelector('.cart-items').innerHTML = `
+                                <div class="empty-cart-message">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <h3>Your cart is empty</h3>
+                                    <p>Continue shopping to add items to your cart</p>
+                                    <a href="/" class="btn btn-primary">Continue Shopping</a>
+                                </div>
+                            `;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while removing the item');
+                }
+            });
+        });
+        
+        function updateOrderSummary() {
+            const items = document.querySelectorAll('.cart-item');
+            let subtotal = 0;
+            
+            items.forEach(item => {
+                const price = parseFloat(item.querySelector('.text-muted').textContent.replace('₹', ''));
+                const quantity = parseInt(item.querySelector('.quantity').textContent);
+                subtotal += price * quantity;
+            });
+            
+            const shipping = subtotal > 0 ? 5.99 : 0;
+            const total = subtotal + shipping;
+            
+            document.querySelector('.subtotal-amount').textContent = `₹${subtotal.toFixed(2)}`;
+            document.querySelector('.shipping-amount').textContent = `₹${shipping.toFixed(2)}`;
+            document.querySelector('.total-amount').textContent = `₹${total.toFixed(2)}`;
+        }
+    });
+    </script>
+</body>
+</html> 
