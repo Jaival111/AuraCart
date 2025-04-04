@@ -107,7 +107,7 @@ async def home(request: Request):
         })
 
 
-@app.post('/', response_class=HTMLResponse)
+@app.post('/search', response_class=HTMLResponse)
 async def search(request: Request, search: str = Form(...)):
     try:
         token = request.cookies.get("access_token")

@@ -205,6 +205,15 @@ df = pd.read_csv("amazon.csv")
 
 @authenticator.get('/', response_class=HTMLResponse)
 async def home(request: Request):
+    # Get top-rated products for all users
+    num_of_products = 20
+    chunk_size = 4
+
+    df["rating"] = df["rating"].apply(lambda x: float(x))
+    top_products = df[df["rating"] >= 4]
+    random_top_products = top_products.sample(n=num_of_products).to_dict(orient="records")
+    data_top_products = [random_top_products[i:i+chunk_size] for i in range(0, len(random_top_products), chunk_size)]
+
     try:
         token = request.cookies.get("access_token")
         if token and token.startswith("Bearer "):
@@ -213,24 +222,40 @@ async def home(request: Request):
                 payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
                 username = payload.get("sub")
                 if username:
-                    # Get the same data as server.py
-                    num_of_products = 20
-                    chunk_size = 4
-
-                    df["rating"] = df["rating"].apply(lambda x: float(x))
-                    top_products = df[df["rating"] >= 4]
-                    random_top_products = top_products.sample(n=num_of_products).to_dict(orient="records")
-                    data_top_products = [random_top_products[i:i+chunk_size] for i in range(0, len(random_top_products), chunk_size)]
-                    
                     # Get complete user data from database
                     user = get_user(userdb, username)
                     cart_count = get_cart_count(username)
+                    
+                    # Get recommended products based on cart items
+                    recommended_products = []
+                    cart = get_cart(username)
+                    if cart and cart.get("items"):
+                        # Get categories from cart items
+                        cart_categories = set()
+                        for item in cart["items"]:
+                            product = df[df['product_id'] == item["product_id"]].iloc[0]
+                            if not product.empty and isinstance(product["category"], str):
+                                categories = [cat.strip() for cat in product["category"].split(",")]
+                                cart_categories.update(categories)
+                        
+                        # Find products with matching categories
+                        if cart_categories:
+                            category_products = df[df["category"].apply(
+                                lambda x: any(cat in str(x).split(",") for cat in cart_categories)
+                            )]
+                            # Exclude products already in cart
+                            cart_product_ids = {item["product_id"] for item in cart["items"]}
+                            category_products = category_products[~category_products["product_id"].isin(cart_product_ids)]
+                            # Get top rated products from matching categories
+                            recommended_products = category_products[category_products["rating"] >= 4].sample(n=min(8, len(category_products))).to_dict(orient="records")
+                            recommended_products = [recommended_products[i:i+chunk_size] for i in range(0, len(recommended_products), chunk_size)]
                     
                     if user:
                         return templates.TemplateResponse("home.html", {
                             "request": request, 
                             "user": user, 
                             "top_products": data_top_products,
+                            "recommended_products": recommended_products,
                             "cart_count": cart_count
                         })
             except JWTError:
@@ -241,7 +266,8 @@ async def home(request: Request):
     return templates.TemplateResponse("home.html", {
         "request": request, 
         "user": None,
-        "top_products": [],
+        "top_products": data_top_products,
+        "recommended_products": [],
         "cart_count": 0
     })
 
