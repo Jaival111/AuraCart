@@ -9,10 +9,15 @@ from config.database import get_cart_count
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from jose import JWTError, jwt
+from sentence_transformers import SentenceTransformer
+from sklearn.cluster import KMeans
+from jose import jwt
 import os
 from dotenv import load_dotenv
 from routes.authentication import get_user, userdb
+
+import warnings
+warnings.filterwarnings("ignore")
 
 load_dotenv()
 
@@ -30,10 +35,16 @@ df = pd.read_csv("amazon.csv")
 
 # Recommend Products
 data = pd.read_csv("amazon_cleaned.csv")
-cv = CountVectorizer(max_features=5000, stop_words='english')
-cv.fit_transform(data['tags'])
-vectors = cv.transform(data['tags']).toarray()
-similarity = cosine_similarity(vectors)
+# cv = CountVectorizer(max_features=5000, stop_words='english')
+# cv.fit_transform(data['tags'])
+# vectors = cv.transform(data['tags']).toarray()
+# similarity = cosine_similarity(vectors)
+
+
+def recommend_by_cluster(product_id, df, top_n=8):
+    cluster_id = data[data['product_id'] == product_id]['embeddings'].values[0]
+    similar_products = df[data['embeddings'] == cluster_id]
+    return similar_products[similar_products['product_id'] != product_id].head(top_n)
 
 
 def recommend(product):
@@ -165,8 +176,10 @@ async def product(product_id: str, request: Request):
 
     chunk_size = 4
     product = df[df["product_id"] == product_id].to_dict(orient="records")[0]
-    recommended_product_indices = recommend(product["product_name"])
-    recommended_products = df.iloc[[i[0] for i in recommended_product_indices]].to_dict(orient="records")
+    
+    # Get recommended products using the new cluster-based recommendation
+    recommended_products_df = recommend_by_cluster(product_id, df)
+    recommended_products = recommended_products_df.to_dict(orient="records")
     recommended_products = [recommended_products[i:i+chunk_size] for i in range(0, len(recommended_products), chunk_size)]
 
     return templates.TemplateResponse("product.html", {
