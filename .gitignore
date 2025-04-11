@@ -173,4 +173,5 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-amazon2.csv
+temp.py
+temp.csv

@@ -15,6 +15,7 @@ from jose import jwt
 import os
 from dotenv import load_dotenv
 from routes.authentication import get_user, userdb
+from pinecone import Pinecone
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -32,26 +33,26 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 df = pd.read_csv("amazon.csv")
+data = pd.read_csv("amazon_cleaned.csv")
 
 # Recommend Products
-data = pd.read_csv("amazon_cleaned.csv")
-# cv = CountVectorizer(max_features=5000, stop_words='english')
-# cv.fit_transform(data['tags'])
-# vectors = cv.transform(data['tags']).toarray()
-# similarity = cosine_similarity(vectors)
-
-
 def recommend_by_cluster(product_id, df, top_n=8):
     cluster_id = data[data['product_id'] == product_id]['embeddings'].values[0]
     similar_products = df[data['embeddings'] == cluster_id]
     return similar_products[similar_products['product_id'] != product_id].head(top_n)
 
 
-def recommend(product):
-    product_index = df[df['product_name'] == product].index[0]
-    distance = similarity[product_index]
-    product_list = sorted(list(enumerate(distance)), reverse=True, key=lambda x: x[1])[1:9]
-    return product_list
+# cv = CountVectorizer(max_features=5000, stop_words='english')
+# cv.fit_transform(data['tags'])
+# vectors = cv.transform(data['tags']).toarray()
+# similarity = cosine_similarity(vectors)
+
+
+# def recommend(product):
+#     product_index = df[df['product_name'] == product].index[0]
+#     distance = similarity[product_index]
+#     product_list = sorted(list(enumerate(distance)), reverse=True, key=lambda x: x[1])[1:9]
+#     return product_list
 
 
 def product_by_category(category):
@@ -77,6 +78,18 @@ def get_products_by_categories():
         })
     
     return category_products
+
+
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+data['search_text'] = data['product_name'] + " " + data['tags']
+pc = Pinecone(api_key=PINECONE_API_KEY, environment="us-east-1")
+index = pc.Index("auracart-product-search")
+model = SentenceTransformer('all-mpnet-base-v2')
+
+def semantic_search(query, top_n=5):
+    query_vector = model.encode(query).tolist()
+    results = index.query(vector=query_vector, top_k=top_n, include_metadata=True)
+    return results['matches']
 
 
 @app.get('/', response_class=HTMLResponse)
@@ -146,7 +159,9 @@ async def search(request: Request, search: str = Form(...)):
             "cart_count": cart_count
         })
 
-    search_results = df[df["product_name"].str.contains(search_query, case=False, na=False)].to_dict(orient="records")
+    # search_results = df[df["product_name"].str.contains(search_query, case=False, na=False)].to_dict(orient="records")
+    search_results = semantic_search(search_query, top_n=10)
+    search_results = [result['metadata'] for result in search_results]
 
     return templates.TemplateResponse("search.html", {
         "request": request, 
