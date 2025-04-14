@@ -1781,7 +1781,7 @@
                                         <i class="fas fa-laptop"></i>
                                     </div>
                                     <h3 class="category-title">Electronics</h3>
-                                    <span class="category-count">248 Products</span>
+                                    <span class="category-count">{{category_count.electronics}} Products</span>
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-4 col-6">
@@ -1790,16 +1790,16 @@
                                         <i class="fas fa-tshirt"></i>
                                     </div>
                                     <h3 class="category-title">Fashion</h3>
-                                    <span class="category-count">357 Products</span>
+                                    <span class="category-count">{{category_count.fashion}} Products</span>
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-4 col-6">
-                                <a href="/category/home" class="category-card stagger-item delay-3">
+                                <a href="/category/home-and-living" class="category-card stagger-item delay-3">
                                     <div class="category-icon">
                                         <i class="fas fa-couch"></i>
                                     </div>
                                     <h3 class="category-title">Home & Living</h3>
-                                    <span class="category-count">184 Products</span>
+                                    <span class="category-count">{{category_count.home}} Products</span>
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-4 col-6">
@@ -1808,7 +1808,7 @@
                                         <i class="fas fa-spa"></i>
                                     </div>
                                     <h3 class="category-title">Beauty</h3>
-                                    <span class="category-count">129 Products</span>
+                                    <span class="category-count">{{category_count.beauty}} Products</span>
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-4 col-6">
@@ -1817,25 +1817,25 @@
                                         <i class="fas fa-basketball-ball"></i>
                                     </div>
                                     <h3 class="category-title">Sports</h3>
-                                    <span class="category-count">93 Products</span>
+                                    <span class="category-count">{{category_count.sports}} Products</span>
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-4 col-6">
-                                <a href="/category/books" class="category-card stagger-item delay-2">
+                                <a href="/category/stationery" class="category-card stagger-item delay-2">
                                     <div class="category-icon">
                                         <i class="fas fa-book"></i>
                                     </div>
-                                    <h3 class="category-title">Books</h3>
-                                    <span class="category-count">215 Products</span>
+                                    <h3 class="category-title">Stationery</h3>
+                                    <span class="category-count">{{category_count.stationary}} Products</span>
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-4 col-6">
-                                <a href="/category/toys" class="category-card stagger-item delay-3">
+                                <a href="/category/toys-and-games" class="category-card stagger-item delay-3">
                                     <div class="category-icon">
                                         <i class="fas fa-gamepad"></i>
                                     </div>
                                     <h3 class="category-title">Toys & Games</h3>
-                                    <span class="category-count">142 Products</span>
+                                    <span class="category-count">{{category_count.toys}} Products</span>
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-4 col-6">
@@ -1844,7 +1844,7 @@
                                         <i class="fas fa-gem"></i>
                                     </div>
                                     <h3 class="category-title">Jewelry</h3>
-                                    <span class="category-count">86 Products</span>
+                                    <span class="category-count">{{category_count.jewelry}} Products</span>
                                 </a>
                             </div>
                         </div>
@@ -1958,10 +1958,13 @@
                                 <p class="newsletter-text">Stay updated with our latest products, exclusive deals, and special offers. Join our community today!</p>
                             </div>
                             <div class="col-lg-6">
-                                <form class="newsletter-form">
+                                <form id="newsletter-form" class="newsletter-form">
                                     <div class="input-group">
-                                        <input type="email" class="form-control" placeholder="Your Email Address" aria-label="Email Address" required>
+                                        <input type="email" name="email" class="form-control" placeholder="Your Email Address" aria-label="Email Address" required>
                                         <button class="btn subscribe-btn" type="submit">Subscribe</button>
+                                    </div>
+                                    <div class="mt-2">
+                                        <p id="newsletter-message" class="mb-0" style="display: none;"></p>
                                     </div>
                                 </form>
                             </div>
@@ -2240,6 +2243,56 @@
             floatingElements[1].setAttribute('data-speed', '0.8');
             floatingElements[2].setAttribute('data-speed', '1.2');
             floatingElements[3].setAttribute('data-speed', '1.0');
+        });
+
+        // Newsletter Form Submission
+        document.getElementById('newsletter-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const messageElement = document.getElementById('newsletter-message');
+            const submitButton = this.querySelector('button[type="submit"]');
+            const emailInput = this.querySelector('input[name="email"]');
+            
+            // Disable form while processing
+            submitButton.disabled = true;
+            emailInput.disabled = true;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Subscribing...';
+            
+            try {
+                const formData = new FormData();
+                formData.append('email', emailInput.value);
+                
+                const response = await fetch('/subscribe-newsletter', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                messageElement.style.display = 'block';
+                if (response.ok) {
+                    messageElement.style.color = '#198754'; // Bootstrap success color
+                    messageElement.textContent = data.message;
+                    emailInput.value = ''; // Clear input on success
+                } else {
+                    messageElement.style.color = '#dc3545'; // Bootstrap danger color
+                    messageElement.textContent = data.message;
+                }
+            } catch (error) {
+                messageElement.style.display = 'block';
+                messageElement.style.color = '#dc3545';
+                messageElement.textContent = 'An error occurred. Please try again later.';
+            } finally {
+                // Re-enable form
+                submitButton.disabled = false;
+                emailInput.disabled = false;
+                submitButton.textContent = 'Subscribe';
+                
+                // Hide message after 5 seconds
+                setTimeout(() => {
+                    messageElement.style.display = 'none';
+                }, 5000);
+            }
         });
     </script>
 

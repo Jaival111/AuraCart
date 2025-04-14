@@ -5,17 +5,14 @@ from fastapi.templating import Jinja2Templates
 from routes.authentication import authenticator
 from routes.cart import router as cart_router
 from config.database import get_cart_count
+from routes.authentication import get_user, userdb
+from pinecone import Pinecone
 
 import pandas as pd
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
-from sklearn.cluster import KMeans
 from jose import jwt
 import os
 from dotenv import load_dotenv
-from routes.authentication import get_user, userdb
-from pinecone import Pinecone
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -40,19 +37,6 @@ def recommend_by_cluster(product_id, df, top_n=8):
     cluster_id = data[data['product_id'] == product_id]['embeddings'].values[0]
     similar_products = df[data['embeddings'] == cluster_id]
     return similar_products[similar_products['product_id'] != product_id].head(top_n)
-
-
-# cv = CountVectorizer(max_features=5000, stop_words='english')
-# cv.fit_transform(data['tags'])
-# vectors = cv.transform(data['tags']).toarray()
-# similarity = cosine_similarity(vectors)
-
-
-# def recommend(product):
-#     product_index = df[df['product_name'] == product].index[0]
-#     distance = similarity[product_index]
-#     product_list = sorted(list(enumerate(distance)), reverse=True, key=lambda x: x[1])[1:9]
-#     return product_list
 
 
 def product_by_category(category):
@@ -94,41 +78,43 @@ def semantic_search(query, top_n=5):
 
 @app.get('/', response_class=HTMLResponse)
 async def home(request: Request):
-    try:
-        token = request.cookies.get("access_token")
-        user = None
-        cart_count = 0
-        if token and token.startswith("Bearer "):
-            token = token.split(" ")[1]
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            username = payload.get("sub")
-            if username:
-                user = get_user(userdb, username)
-                cart_count = get_cart_count(username)
+    token = request.cookies.get("access_token")
+    user = None
+    cart_count = 0
+    if token and token.startswith("Bearer "):
+        token = token.split(" ")[1]
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        if username:
+            user = get_user(userdb, username)
+            cart_count = get_cart_count(username)
 
-        num_of_products = 20
-        chunk_size = 4
+    num_of_products = 20
+    chunk_size = 4
 
-        df["rating"] = df["rating"].apply(lambda x: float(x))
-        top_products = df[df["rating"] >= 4]
-        random_top_products = top_products.sample(n=num_of_products).to_dict(orient="records")
-        data_top_products = [random_top_products[i:i+chunk_size] for i in range(0, len(random_top_products), chunk_size)]
-        
-        # category_products = get_products_by_categories()
+    df["rating"] = df["rating"].apply(lambda x: float(x))
+    top_products = df[df["rating"] >= 4]
+    random_top_products = top_products.sample(n=num_of_products).to_dict(orient="records")
+    data_top_products = [random_top_products[i:i+chunk_size] for i in range(0, len(random_top_products), chunk_size)]
+    
+    category_count = {
+        'electronics': "150K+",
+        'fashion': "270K+",
+        'home': "370K+",
+        'beauty': "60K+",
+        'sports': "20K+",
+        'stationery': "10K+",
+        'toys': "190K+",
+        'jewelry': "40K+"
+    }
 
-        return templates.TemplateResponse("home.html", {
-            "request": request, 
-            "top_products": data_top_products,
-            "user": user,
-            "cart_count": cart_count
-        })
-    except:
-        return templates.TemplateResponse("home.html", {
-            "request": request, 
-            "top_products": data_top_products,
-            "user": None,
-            "cart_count": 0
-        })
+    return templates.TemplateResponse("home.html", {
+        "request": request, 
+        "top_products": data_top_products,
+        "user": user,
+        "cart_count": cart_count,
+        "category_count": category_count
+    })
 
 
 @app.post('/search', response_class=HTMLResponse)
@@ -159,7 +145,6 @@ async def search(request: Request, search: str = Form(...)):
             "cart_count": cart_count
         })
 
-    # search_results = df[df["product_name"].str.contains(search_query, case=False, na=False)].to_dict(orient="records")
     search_results = semantic_search(search_query, top_n=10)
     search_results = [result['metadata'] for result in search_results]
 
@@ -201,6 +186,72 @@ async def product(product_id: str, request: Request):
         "request": request, 
         "product": product, 
         "recommended_products": recommended_products,
+        "user": user,
+        "cart_count": cart_count
+    })
+
+
+products_data = pd.read_csv("amazon_products.csv")
+
+def get_top_products(category: str):
+    num_of_products = 20
+    chunk_size = 4
+    category_df = products_data[products_data['category_id'] == category]
+    
+    # Try to get products with stars >= 4
+    high_rated_products = category_df[category_df['stars'] >= 4]
+    
+    # If there are no high-rated products, use all products in the category
+    if len(high_rated_products) == 0:
+        top_products = category_df.sample(n=min(num_of_products, len(category_df))).to_dict(orient="records")
+    else:
+        top_products = high_rated_products.sample(n=min(num_of_products, len(high_rated_products))).to_dict(orient="records")
+    
+    top_products = [top_products[i:i+chunk_size] for i in range(0, len(top_products), chunk_size)]
+    return top_products
+
+def get_best_sellers(category: str):
+    num_of_products = 20
+    chunk_size = 4
+    category_df = products_data[products_data['category_id'] == category]
+    
+    # Try to get best sellers
+    best_seller_products = category_df[category_df['isBestSeller'] == 'TRUE']
+    
+    # If there are no best sellers, use all products in the category
+    if len(best_seller_products) == 0:
+        best_sellers = category_df.sample(n=min(num_of_products, len(category_df))).to_dict(orient="records")
+    else:
+        best_sellers = best_seller_products.sample(n=min(num_of_products, len(best_seller_products))).to_dict(orient="records")
+    
+    best_sellers = [best_sellers[i:i+chunk_size] for i in range(0, len(best_sellers), chunk_size)]
+    return best_sellers
+
+@app.get('/category/{category_}', response_class=HTMLResponse)
+async def products_by_category(category_: str, request: Request):
+    try:
+        token = request.cookies.get("access_token")
+        user = None
+        cart_count = 0
+        if token and token.startswith("Bearer "):
+            token = token.split(" ")[1]
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            username = payload.get("sub")
+            if username:
+                user = get_user(userdb, username)
+                cart_count = get_cart_count(username)
+    except:
+        user = None
+        cart_count = 0
+
+    top_products = get_top_products(category_)
+    best_sellers = get_best_sellers(category_)
+
+    return templates.TemplateResponse("category.html", {
+        "request": request,
+        "category": category_,
+        "top_products": top_products,
+        "best_sellers": best_sellers,
         "user": user,
         "cart_count": cart_count
     })

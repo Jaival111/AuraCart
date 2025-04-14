@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
 from typing import Optional, Dict, List
+from datetime import datetime
 
 load_dotenv()
 MONGODB_URI = os.getenv("MONGODB_URI")
@@ -12,6 +13,7 @@ db = client.get_database("AuraCart")
 
 userdb = db["userdata"]
 cartdb = db["carts"]
+newsletterdb = db["newsletter_subscribers"]
 
 
 def get_cart(user_id: str) -> Optional[Dict]:
@@ -86,4 +88,26 @@ def get_cart_count(user_id: str) -> int:
     if not cart or not cart.get("items"):
         return 0
     return sum(item.get("quantity", 0) for item in cart["items"])
+
+def add_newsletter_subscriber(email: str) -> bool:
+    """
+    Add a new subscriber to the newsletter.
+    
+    Args:
+        email (str): The email address to add
+        
+    Returns:
+        bool: True if successfully added, False if already exists
+    """
+    # Check if email already exists
+    existing = newsletterdb.find_one({"email": email})
+    if existing:
+        return False
+    
+    # Add new subscriber
+    newsletterdb.insert_one({
+        "email": email,
+        "subscribed_at": datetime.now()
+    })
+    return True
 

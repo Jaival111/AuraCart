@@ -175,3 +175,6 @@ cython_debug/
 
 temp.py
 temp.csv
+model_up.ipynb
+amazon_products.csv
+amazon_categories.csv

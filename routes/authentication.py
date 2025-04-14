@@ -156,13 +156,25 @@ async def login_for_access_token(request: Request, form_data: OAuth2PasswordRequ
     random_top_products = top_products.sample(n=num_of_products).to_dict(orient="records")
     data_top_products = [random_top_products[i:i+chunk_size] for i in range(0, len(random_top_products), chunk_size)]
 
+    category_count = {
+        'electronics': "150K+",
+        'fashion': "270K+",
+        'home': "370K+",
+        'beauty': "60K+",
+        'sports': "20K+",
+        'stationery': "10K+",
+        'toys': "190K+",
+        'jewelry': "40K+"
+    }
+
     response = templates.TemplateResponse(
         "home.html",
         {
             "request": request,
             "user": user,
             "top_products": data_top_products,
-            "cart_count": get_cart_count(user.username)
+            "cart_count": get_cart_count(user.username),
+            "category_count": category_count
         }
     )
     response.set_cookie(
@@ -214,6 +226,17 @@ async def home(request: Request):
     random_top_products = top_products.sample(n=num_of_products).to_dict(orient="records")
     data_top_products = [random_top_products[i:i+chunk_size] for i in range(0, len(random_top_products), chunk_size)]
 
+    category_count = {
+        'electronics': "150K+",
+        'fashion': "270K+",
+        'home': "370K+",
+        'beauty': "60K+",
+        'sports': "20K+",
+        'stationery': "10K+",
+        'toys': "190K+",
+        'jewelry': "40K+"
+    }
+
     try:
         token = request.cookies.get("access_token")
         if token and token.startswith("Bearer "):
@@ -231,7 +254,8 @@ async def home(request: Request):
                             "request": request, 
                             "user": user, 
                             "top_products": data_top_products,
-                            "cart_count": cart_count
+                            "cart_count": cart_count,
+                            "category_count": category_count
                         })
             except JWTError:
                 pass
@@ -242,7 +266,8 @@ async def home(request: Request):
         "request": request, 
         "user": None,
         "top_products": data_top_products,
-        "cart_count": 0
+        "cart_count": 0,
+        "category_count": category_count
     })
 
 

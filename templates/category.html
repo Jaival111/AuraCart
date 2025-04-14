@@ -1,0 +1,44 @@
+{% import "carousel.html" as carousel_ %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraCart</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/carousel.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/home.css') }}">
+</head>
+
+<body>
+
+    {% include "header.html" %}
+
+    <section id="featured-products" class="products-section">
+        <div class="container">
+            <div class="section-title-container animate-on-scroll">
+                <h2 class="section-title">Top Rated Products</h2>
+                <p class="section-subtitle">Discover our best-selling products loved by customers worldwide</p>
+            </div>
+            <div class="animate-on-scroll">
+                {{ carousel_.carousel(top_products, "top") }}
+            </div>
+        </div>
+    </section>
+
+    <section id="featured-products" class="products-section">
+        <div class="container">
+            <div class="section-title-container animate-on-scroll">
+                <h2 class="section-title">Best Selling Products</h2>
+                <p class="section-subtitle">Discover our best-selling products loved by customers worldwide</p>
+            </div>
+            <div class="animate-on-scroll">
+                {{ carousel_.carousel(best_sellers, "best") }}
+            </div>
+        </div>
+    </section>
+
+</body>
+
+</html>
