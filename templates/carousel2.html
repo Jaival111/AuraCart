@@ -164,6 +164,8 @@
         position: relative;
         overflow: hidden;
         letter-spacing: 0.5px;
+        text-decoration: none;
+        display: block;
     }
 
     .view-details-btn::before {
@@ -180,6 +182,7 @@
     .view-details-btn:hover {
         box-shadow: 0 6px 20px rgba(26, 5, 51, 0.25);
         transform: translateY(-2px);
+        color: #FFFFFF;
     }
 
     .view-details-btn:hover::before {
@@ -315,41 +318,102 @@
         background-color: white;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     }
+    
+    /* Responsive styles */
+    @media (max-width: 1200px) {
+        .product-card {
+            width: 320px;
+            height: 500px;
+        }
+        
+        .products-row {
+            gap: 1.5rem;
+        }
+    }
+    
+    @media (max-width: 992px) {
+        .product-card {
+            width: 280px;
+            height: 450px;
+        }
+        
+        .carousel-control-prev,
+        .carousel-control-next {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .carousel-control-prev {
+            left: 20px;
+        }
+        
+        .carousel-control-next {
+            right: 20px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .product-card {
+            width: 240px;
+            height: 400px;
+        }
+        
+        .product-image {
+            height: 200px;
+        }
+        
+        .product-title {
+            font-size: 1rem;
+        }
+        
+        .discounted-price {
+            font-size: 1.25rem;
+        }
+    }
 </style>
 
 <div class="container">
     <div id="carousel{{category}}" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
-            {% for product_list in product_ %}
-            <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
-                <div class="products-row">
-                    {% for product in product_list %}
-                    <div class="product-card">
-                        <div class="card">
-                            <div class="product-image">
-                                <img src="{{product.imgUrl}}" alt="{{product.title}}">
-                            </div>
-                            <div class="card-body">
-                                <h5 class="product-title">{{product.title[:50]}}{% if product.title|length
-                                    > 50 %}...{% endif %}</h5>
-                                <!-- <p class="card-text">{{product.about_product[:100]}}{% if product.about_product|length >
-                                    100 %}...{% endif %}</p> -->
-
-                                <div class="price-container">
-                                    <span class="discounted-price">{{product.price}}</span>
-                                    <span class="original-price">{{product.listPrice}}</span>
-                                    <!-- <span class="discount-badge">-{{product.discount_percentage}}</span> -->
+            {% if product_ and product_|length > 0 %}
+                {% for product_list in product_ %}
+                <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
+                    <div class="products-row">
+                        {% for product in product_list %}
+                        <div class="product-card">
+                            <div class="card">
+                                <div class="product-image">
+                                    <img src="{{product.imgUrl}}" alt="{{product.title}}">
                                 </div>
+                                <div class="card-body">
+                                    <h5 class="product-title">{{product.title[:50]}}{% if product.title|length > 50 %}...{% endif %}</h5>
 
-                                <a href="/product-{{product.asin}}" class="view-details-btn">View Details</a>
+                                    <div class="price-container">
+                                        <span class="discounted-price">{{product.price}}</span>
+                                        <span class="original-price">{{product.listPrice}}</span>
+                                        <!-- <span class="discount-badge">-{{product.discount_percentage}}</span> -->
+                                    </div>
+
+                                    <a href="/p-{{product.asin}}" class="view-details-btn">View Details</a>
+                                </div>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
                 </div>
-            </div>
-            {% endfor %}
+                {% endfor %}
+            {% else %}
+                <div class="carousel-item active">
+                    <div class="products-row">
+                        <div class="text-center w-100 py-5">
+                            <h3>No products found in this category</h3>
+                            <p>Please check back later for new products.</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
+        {% if product_ and product_|length > 1 %}
         <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{category}}" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Previous</span>
@@ -358,6 +422,7 @@
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Next</span>
         </button>
+        {% endif %}
     </div>
 </div>
 
@@ -425,6 +490,19 @@
             cartCount.style.animation = 'pop 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
         }
     }
+    
+    // Initialize carousel
+    document.addEventListener('DOMContentLoaded', function() {
+        const carousels = document.querySelectorAll('.carousel');
+        carousels.forEach(carousel => {
+            if (carousel.querySelectorAll('.carousel-item').length > 1) {
+                new bootstrap.Carousel(carousel, {
+                    interval: 5000,
+                    wrap: true
+                });
+            }
+        });
+    });
 </script>
 
 {% endmacro %}

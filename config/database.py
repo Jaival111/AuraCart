@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
-from typing import Optional, Dict, List
+from typing import Optional, Dict
 from datetime import datetime
 
 load_dotenv()

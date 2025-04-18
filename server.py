@@ -1,10 +1,10 @@
 from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from routes.authentication import authenticator
 from routes.cart import router as cart_router
-from config.database import get_cart_count
+from config.database import get_cart_count, add_newsletter_subscriber
 from routes.authentication import get_user, userdb
 from pinecone import Pinecone
 
@@ -105,7 +105,7 @@ async def home(request: Request):
         'sports': "20K+",
         'stationery': "10K+",
         'toys': "190K+",
-        'jewelry': "40K+"
+        'others': "280K+"
     }
 
     return templates.TemplateResponse("home.html", {
@@ -190,8 +190,15 @@ async def product(product_id: str, request: Request):
         "cart_count": cart_count
     })
 
+###################
+###################
+###################
+###################
+###################
 
-products_data = pd.read_csv("amazon_products.csv")
+
+products_data = pd.read_csv("amazon_products_cleaned.csv")
+
 
 def get_top_products(category: str):
     num_of_products = 20
@@ -207,8 +214,15 @@ def get_top_products(category: str):
     else:
         top_products = high_rated_products.sample(n=min(num_of_products, len(high_rated_products))).to_dict(orient="records")
     
+    # Ensure we have at least one product
+    if not top_products:
+        # If no products found, return an empty list
+        return []
+    
+    # Group products into chunks for the carousel
     top_products = [top_products[i:i+chunk_size] for i in range(0, len(top_products), chunk_size)]
     return top_products
+
 
 def get_best_sellers(category: str):
     num_of_products = 20
@@ -216,7 +230,7 @@ def get_best_sellers(category: str):
     category_df = products_data[products_data['category_id'] == category]
     
     # Try to get best sellers
-    best_seller_products = category_df[category_df['isBestSeller'] == 'TRUE']
+    best_seller_products = category_df[category_df['isBestSeller'] == True]
     
     # If there are no best sellers, use all products in the category
     if len(best_seller_products) == 0:
@@ -224,8 +238,21 @@ def get_best_sellers(category: str):
     else:
         best_sellers = best_seller_products.sample(n=min(num_of_products, len(best_seller_products))).to_dict(orient="records")
     
+    # Ensure we have at least one product
+    if not best_sellers:
+        # If no products found, return an empty list
+        return []
+    
+    # Group products into chunks for the carousel
     best_sellers = [best_sellers[i:i+chunk_size] for i in range(0, len(best_sellers), chunk_size)]
     return best_sellers
+
+
+def recommend_by_cluster_category(product_id, df, top_n=10):
+    cluster_id = df[df['asin'] == product_id]['embeddings'].values[0]
+    similar_products = df[df['embeddings'] == cluster_id]
+    return similar_products[similar_products['asin'] != product_id][['asin', 'title', 'price']].head(top_n)
+
 
 @app.get('/category/{category_}', response_class=HTMLResponse)
 async def products_by_category(category_: str, request: Request):
@@ -255,3 +282,80 @@ async def products_by_category(category_: str, request: Request):
         "user": user,
         "cart_count": cart_count
     })
+
+
+@app.get('/p-{product_id}', response_class=HTMLResponse)
+async def product_by_category(product_id: str, request: Request):
+    try:
+        token = request.cookies.get("access_token")
+        user = None
+        cart_count = 0
+        if token and token.startswith("Bearer "):
+            token = token.split(" ")[1]
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            username = payload.get("sub")
+            if username:
+                user = get_user(userdb, username)
+                cart_count = get_cart_count(username)
+    except:
+        user = None
+        cart_count = 0
+
+    chunk_size = 4
+    product = products_data[products_data["asin"] == product_id].to_dict(orient="records")[0]
+    
+    # Get recommended products using the new cluster-based recommendation
+    recommended_products_df = recommend_by_cluster_category(product_id, products_data)
+    recommended_products = recommended_products_df.to_dict(orient="records")
+    recommended_products = [recommended_products[i:i+chunk_size] for i in range(0, len(recommended_products), chunk_size)]
+
+    return templates.TemplateResponse("product2.html", {
+        "request": request, 
+        "product": product, 
+        "recommended_products": recommended_products,
+        "user": user,
+        "cart_count": cart_count
+    })
+
+
+@app.post('/subscribe-newsletter')
+async def subscribe_newsletter(request: Request):
+    try:
+        # Try to get JSON data first
+        try:
+            data = await request.json()
+            email = data.get('email')
+        except:
+            # If JSON parsing fails, try form data
+            form_data = await request.form()
+            email = form_data.get('email')
+        
+        if not email:
+            print("Error: Email is required")
+            return JSONResponse(
+                status_code=400,
+                content={"message": "Email is required"}
+            )
+            
+        print(f"Attempting to subscribe email: {email}")
+        success = add_newsletter_subscriber(email)
+        
+        if success:
+            print(f"Successfully subscribed email: {email}")
+            return JSONResponse(
+                status_code=200,
+                content={"message": "Successfully subscribed to newsletter!"}
+            )
+        else:
+            print(f"Email already subscribed: {email}")
+            return JSONResponse(
+                status_code=400,
+                content={"message": "Email already subscribed"}
+            )
+            
+    except Exception as e:
+        print(f"Error in newsletter subscription: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"message": f"An error occurred: {str(e)}"}
+        )

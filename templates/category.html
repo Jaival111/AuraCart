@@ -6,19 +6,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuraCart</title>
+    <title>{{ category|title }} - AuraCart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', path='css/carousel.css') }}">
+    <style>
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .category-header {
+            background: linear-gradient(135deg, #1a0533, #360d6a);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .category-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .category-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .category-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .section-title-container {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a0533;
+            margin-bottom: 0.5rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, #1a0533, #360d6a);
+            border-radius: 3px;
+        }
+        
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .products-section {
+            padding: 3rem 0;
+            position: relative;
+        }
+        
+        .products-section:nth-child(even) {
+            background-color: #ffffff;
+        }
+        
+        .products-section:nth-child(odd) {
+            background-color: #f8f9fc;
+        }
+        
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        @media (max-width: 768px) {
+            .category-title {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.75rem;
+            }
+            
+            .category-subtitle,
+            .section-subtitle {
+                font-size: 1rem;
+                padding: 0 1rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
-
     {% include "header.html" %}
 
-    <section id="featured-products" class="products-section">
+    <div class="category-header">
+        <div class="container">
+            <h1 class="category-title">{{ category|title }}</h1>
+            <p class="category-subtitle">Discover our amazing collection of {{ category|title }} products</p>
+        </div>
+    </div>
+
+    <section id="top-rated-products" class="products-section">
         <div class="container">
             <div class="section-title-container animate-on-scroll">
                 <h2 class="section-title">Top Rated Products</h2>
-                <p class="section-subtitle">Discover our best-selling products loved by customers worldwide</p>
+                <p class="section-subtitle">Discover our highest-rated products loved by customers worldwide</p>
             </div>
             <div class="animate-on-scroll">
                 {{ carousel_.carousel(top_products, "top") }}
@@ -26,11 +149,11 @@
         </div>
     </section>
 
-    <section id="featured-products" class="products-section">
+    <section id="best-selling-products" class="products-section">
         <div class="container">
             <div class="section-title-container animate-on-scroll">
                 <h2 class="section-title">Best Selling Products</h2>
-                <p class="section-subtitle">Discover our best-selling products loved by customers worldwide</p>
+                <p class="section-subtitle">Discover our best-selling products that customers can't stop buying</p>
             </div>
             <div class="animate-on-scroll">
                 {{ carousel_.carousel(best_sellers, "best") }}
@@ -38,6 +161,30 @@
         </div>
     </section>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animation on scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const animateElements = document.querySelectorAll('.animate-on-scroll');
+            
+            function checkVisibility() {
+                animateElements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const elementVisible = 150;
+                    
+                    if (elementTop < window.innerHeight - elementVisible) {
+                        element.classList.add('visible');
+                    }
+                });
+            }
+            
+            // Check visibility on load
+            checkVisibility();
+            
+            // Check visibility on scroll
+            window.addEventListener('scroll', checkVisibility);
+        });
+    </script>
 </body>
 
 </html>

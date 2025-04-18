@@ -164,7 +164,7 @@ async def login_for_access_token(request: Request, form_data: OAuth2PasswordRequ
         'sports': "20K+",
         'stationery': "10K+",
         'toys': "190K+",
-        'jewelry': "40K+"
+        'others': "280K+"
     }
 
     response = templates.TemplateResponse(
@@ -234,7 +234,7 @@ async def home(request: Request):
         'sports': "20K+",
         'stationery': "10K+",
         'toys': "190K+",
-        'jewelry': "40K+"
+        'others': "280K+"
     }
 
     try:
