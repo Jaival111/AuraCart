@@ -18,16 +18,19 @@
             color: #1a0533;
             overflow-x: hidden;
         }
-
+        .cont{
+            width: 100%;
+        }
         /* Premium Navbar Styling */
         .navbar {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.4) 100%);
+            background: linear-gradient(to right, rgba(52, 21, 77, 0.98), rgba(84, 27, 124, 0.95)) !important;
+           
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(26, 5, 51, 0.15);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: sticky;
+            position:sticky;
             top: 0;
             z-index: 1000;
         }
@@ -50,19 +53,19 @@
         }
 
         /* Enhanced Navbar Links */
-        .navbar .nav-link,
+        /* .navbar .nav-link,
         .navbar .navbar-brand {
-            color: #1a0533 !important;
+            /* color: #1a0533 !important;
             font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            position: relative;
-            padding: 0.5rem 1rem;
+            letter-spacing: 1.5px; */
+            /* position: relative; */
+            /* padding: 0.5rem 1rem;
             margin: 0 0.2rem;
-            transition: all 0.3s ease;
-        }
+            transition: all 0.3s ease; 
+        }  */
 
-        .navbar .nav-link::after,
+     .navbar .nav-link::after,
         .navbar .navbar-brand::after {
             content: '';
             position: absolute;
@@ -75,7 +78,7 @@
             transform: translateX(-50%);
         }
 
-        .navbar .nav-link:hover::after,
+       .navbar .nav-link:hover::after,
         .navbar .navbar-brand:hover::after {
             width: 80%;
         }
@@ -84,7 +87,7 @@
         .navbar .navbar-brand:hover {
             color: #2a0a4a !important;
             transform: translateY(-1px);
-        }
+        } 
 
         /* Premium Search Bar */
         .navbar .search-bar {
@@ -108,7 +111,7 @@
         .navbar .search-bar::placeholder {
             color: rgba(26, 5, 51, 0.6);
             font-style: italic;
-        }
+        } 
 
         /* Responsive Adjustments */
         @media (max-width: 768px) {
@@ -595,8 +598,11 @@
     </style>
 </head>
 <body>
+  
+   <div class="cont">
     {% include "header.html" %}
-
+   </div>
+   
     <div class="product-container">
         <div class="row g-4">
             <div class="col-lg-6">
@@ -665,6 +671,7 @@
         <h2 class="section-title">Recommended Products</h2>
         {{ carousel_.carousel(recommended_products, "recommend") }}
     </div>
+   
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
