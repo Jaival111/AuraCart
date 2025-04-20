@@ -279,3 +279,27 @@ async def logout(request: Request):
     )
     response.delete_cookie(key="access_token")
     return response
+
+
+@authenticator.get('/chatbot', response_class=HTMLResponse)
+async def chatbot_page(request: Request):
+    try:
+        token = request.cookies.get("access_token")
+        user = None
+        cart_count = 0
+        if token and token.startswith("Bearer "):
+            token = token.split(" ")[1]
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            username = payload.get("sub")
+            if username:
+                user = get_user(userdb, username)
+                cart_count = get_cart_count(username)
+    except:
+        user = None
+        cart_count = 0
+
+    return templates.TemplateResponse("chatbot.html", {
+        "request": request,
+        "user": user,
+        "cart_count": cart_count
+    })

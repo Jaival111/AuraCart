@@ -7,9 +7,11 @@ from routes.cart import router as cart_router
 from config.database import get_cart_count, add_newsletter_subscriber
 from routes.authentication import get_user, userdb
 from pinecone import Pinecone
-
+import polars as pl
 import pandas as pd
-from sentence_transformers import SentenceTransformer
+import torch
+from sentence_transformers import SentenceTransformer, util
+import pickle
 from jose import jwt
 import os
 from dotenv import load_dotenv
@@ -359,3 +361,71 @@ async def subscribe_newsletter(request: Request):
             status_code=500,
             content={"message": f"An error occurred: {str(e)}"}
         )
+
+# Load chatbot model and data
+chatbot_df = pl.read_csv("temp.csv", ignore_errors=True)
+# chatbot_model = SentenceTransformer('all-mpnet-base-v2', device='cuda')
+desc_embeddings = pickle.load(open("product_description_embeddings.pkl", "rb"))
+
+@app.get('/chatbot', response_class=HTMLResponse)
+async def chatbot_page(request: Request):
+    try:
+        token = request.cookies.get("access_token")
+        user = None
+        cart_count = 0
+        if token and token.startswith("Bearer "):
+            token = token.split(" ")[1]
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            username = payload.get("sub")
+            if username:
+                user = get_user(userdb, username)
+                cart_count = get_cart_count(username)
+    except:
+        user = None
+        cart_count = 0
+
+    return templates.TemplateResponse("chatbot.html", {
+        "request": request,
+        "user": user,
+        "cart_count": cart_count
+    })
+
+@app.post('/chatbot/search')
+async def chatbot_search(request: Request, query: str = Form(...)):
+    try:
+        token = request.cookies.get("access_token")
+        user = None
+        if token and token.startswith("Bearer "):
+            token = token.split(" ")[1]
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            username = payload.get("sub")
+            if username:
+                user = get_user(userdb, username)
+    except:
+        user = None
+
+    # Process the query
+    query_embedding = model.encode(query, convert_to_tensor=True)
+    desc_embeddings_tensor = torch.stack(desc_embeddings).to(query_embedding.device)
+    similarities = util.cos_sim(desc_embeddings_tensor, query_embedding)
+
+    # Add scores to dataframe
+    df_with_scores = chatbot_df.with_columns([
+        pl.Series(name="score", values=similarities.cpu().squeeze().tolist())
+    ])
+
+    # Get top 5 results
+    top_results = df_with_scores.sort("score", descending=True).head(10)
+    
+    # Format results
+    results = []
+    for row in top_results.iter_rows(named=True):
+        results.append({
+            "title": row['title'],
+            "price": row['price'],
+            "rating": row['stars'],
+            "image_url": row.get('image_url', '/static/default-product.png'),  # Use default image if no image URL
+            "link": f"/p-{row['asin']}"  # Using the existing product endpoint
+        })
+
+    return JSONResponse(content={"results": results})

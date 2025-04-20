@@ -8,21 +8,32 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active fw-light" aria-current="page" href="/" style="color: #F8F4E3; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">Home</a>
-                </li>
                 {% if user %}
                     <li class="nav-item">
                         <span class="nav-link fw-light" style="color: #F8F4E3; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">Welcome, {{ user.username }}</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active fw-light" aria-current="page" href="/" style="color: #F8F4E3; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-light" href="/chatbot" style="color: #F8F4E3; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">Talk to Chatbot</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link fw-light" href="/logout" style="color: #F8F4E3; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">Logout</a>
                     </li>
                 {% else %}
                     <li class="nav-item">
+                        <a class="nav-link active fw-light" aria-current="page" href="/" style="color: #F8F4E3; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-light" href="/chatbot" style="color: #F8F4E3; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">Talk to Chatbot</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link fw-light" href="/login" style="color: #F8F4E3; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">Login</a>
                     </li>
                 {% endif %}
+                
+                
             </ul>
             <form class="d-flex align-items-center" role="search" method="post" action="/search">
                 <input class="form-control me-2 border-0 search-bar" type="search" name="search" placeholder="Search products..." aria-label="Search">
