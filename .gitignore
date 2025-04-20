@@ -179,3 +179,7 @@ model_up.ipynb
 amazon_products.csv
 amazon_categories.csv
 amazon_products_cleaned.csv
+amazon_products_with_description.csv
+product_description_embeddings.pkl
+model_temp.ipynb
+model_temp2.ipynb
