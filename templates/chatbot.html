@@ -45,6 +45,25 @@
     </div>
 </div>
 
+<style>
+    .product-image-container {
+        position: relative;
+        padding-top: 75%; /* 4:3 aspect ratio */
+        overflow: hidden;
+        background-color: #f8f9fa;
+    }
+    
+    .product-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: opacity 0.3s ease;
+    }
+</style>
+
 <script>
 document.getElementById('chat-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -120,7 +139,7 @@ document.getElementById('chat-form').addEventListener('submit', async (e) => {
             productCard.innerHTML = `
                 <div class="product-card">
                     <div class="product-image-container">
-                        <img src="${product.image_url}" alt="${product.title}" class="product-image" onerror="this.src='/static/default-product.png'">
+                        <img src="${product.image_url}" alt="${product.title}" class="product-image" onerror="this.onerror=null; this.src='/static/default-product.png';">
                     </div>
                     <div class="product-card-content">
                         <h4 class="product-title">${product.title}</h4>
